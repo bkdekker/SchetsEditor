@@ -22,7 +22,7 @@ namespace SchetsEditor
         {
             return this;
         }
-        public Element(ISchetsTool tool, Point p1, Point p2, Brush kleur, bool tekenen)
+       /* public Element(ISchetsTool tool, Point p1, Point p2, Brush kleur, bool tekenen)
         {
             this.tekenen = tekenen;
             this.tool = tool;
@@ -31,8 +31,8 @@ namespace SchetsEditor
             this.kleur = kleur;
             //this.
             
-        }
-        public Element(ISchetsTool tool, Point p1, Point p2, Brush kleur, string tekst, bool tekenen)
+        }*/
+        public Element(ISchetsTool tool, Point p1, Point p2, Brush kleur, bool tekenen, string tekst)
         {
 
             this.tool = tool;
@@ -76,6 +76,14 @@ namespace SchetsEditor
             else if (tool.GetType() == typeof(RechthoekTool))
             {
                 g.DrawRectangle(MaakPen(kleur, 3), TweepuntTool.Punten2Rechthoek(p1, p2));
+            }
+            else if(tool.GetType() == typeof(TekstTool))
+            {
+                Font font = new Font("Tahoma", 40);
+                SizeF sz =
+                g.MeasureString(tekst, font, p1, StringFormat.GenericTypographic);
+                g.DrawString(tekst, font, kleur,
+                                              p1, StringFormat.GenericTypographic);
             }
         }
 

@@ -45,8 +45,15 @@ namespace SchetsEditor
                 gr.DrawString   (tekst, font, kwast, 
                                               this.startpunt, StringFormat.GenericTypographic);
                 // gr.DrawRectangle(Pens.Black, startpunt.X, startpunt.Y, sz.Width, sz.Height);
+                
+                TekstTool l = new TekstTool();
+                Point test = new Point(startpunt.X + 2*(int)sz.Width, startpunt.Y + 2*(int)sz.Width);
+                Element k = new Element(l, startpunt, test, kwast, true, tekst);
+                s.Schets.elements_list.Add(k);
+                
                 startpunt.X += (int)sz.Width;
                 s.Invalidate();
+                
             }
         }
     }
@@ -84,7 +91,6 @@ namespace SchetsEditor
         
         public virtual void Compleet(SchetsControl s, Graphics g, Point p1, Point p2)
         {
-            //s.Schets.element.Add();
             this.Bezig(g, p1, p2);
         }
     }
@@ -94,33 +100,17 @@ namespace SchetsEditor
         public override string ToString() { return "kader"; }
 
         public override void Bezig(Graphics g, Point p1, Point p2)
-        {   g.DrawRectangle(MaakPen(kwast,3), TweepuntTool.Punten2Rechthoek(p1, p2));
-            // ik denk dat deze moet verplaatst worden naar de Element Klasse
-            // ik 
-            
+        {   
+            g.DrawRectangle(MaakPen(kwast,3), TweepuntTool.Punten2Rechthoek(p1, p2)); 
         }
         public override void Compleet(SchetsControl s, Graphics g, Point p1, Point p2)
         {
           
             RechthoekTool l = new RechthoekTool();
-            Element k = new Element(l, p1, p2, kwast, true);
+            Element k = new Element(l, p1, p2, kwast, true, "rechthoek");
             s.Schets.elements_list.Add(k);
             this.Bezig(g, p1, p2);
-            /*
-            foreach (Element elem in s.Schets.elements_list)
-            {
-                if (elem.tool.GetType() == typeof(RechthoekTool))
-                {
-                    if (elem.tool.GetType() != typeof(VolRechthoekTool))
-                    {
-                        if (elem.tekenen == true)
-                        {
-                            g.DrawRectangle(MaakPen(elem.kleur, 3), TweepuntTool.Punten2Rechthoek(elem.p1, elem.p2));
-                        }
-                    }
-                }
-            }
-            s.Invalidate();*/
+
         }
     }
     
@@ -132,19 +122,8 @@ namespace SchetsEditor
         public override void Compleet(SchetsControl s, Graphics g, Point p1, Point p2)
         {
             VolRechthoekTool l = new VolRechthoekTool();
-            Element k = new Element(l, p1, p2, kwast, true);
+            Element k = new Element(l, p1, p2, kwast, true, "volrechthoek");
             s.Schets.elements_list.Add(k);
-            /*
-            foreach (Element elem in s.Schets.elements_list)
-            {
-                if (elem.tool.GetType() == typeof(VolRechthoekTool))
-                {
-                    g.FillRectangle(elem.kleur, TweepuntTool.Punten2Rechthoek(elem.p1, elem.p2)) ;
-
-                }
-            }
-            s.Invalidate();*/
-            //Element.teken(this, g, p1, p2);
             g.FillRectangle(kwast, TweepuntTool.Punten2Rechthoek(p1, p2));
 
         }
@@ -159,23 +138,10 @@ namespace SchetsEditor
         }
         public override void Compleet(SchetsControl s, Graphics g, Point p1, Point p2)
         {
-            //brush is kwast
-            LijnTool l = new LijnTool();
-            Element k = new Element(l, p1, p2, kwast, true);
-            s.Schets.elements_list.Add(k);
-            /*
-            foreach (Element elem in s.Schets.elements_list)
-            {
-                if (elem.tool.GetType() == typeof(LijnTool))
-                {
-                    if (elem.tool.GetType() != typeof(PenTool))
-                    {
-                        g.DrawLine(MaakPen(elem.kleur, 3), elem.p1, elem.p2);
-                    }
-                }
-            }
-            s.Invalidate();*/
 
+            LijnTool l = new LijnTool();
+            Element k = new Element(l, p1, p2, kwast, true, "LijnTool");
+            s.Schets.elements_list.Add(k);
             this.Bezig(g, p1, p2);
         }
     }
@@ -192,17 +158,8 @@ namespace SchetsEditor
         {
             
             PenTool l = new PenTool();
-            Element k = new Element(l, p1, p2, kwast, true);
+            Element k = new Element(l, p1, p2, kwast, true, "PenTool");
             s.Schets.elements_list.Add(k);
-            /*
-            foreach (Element elem in s.Schets.elements_list)
-            {
-                if (elem.tool.GetType() == typeof(PenTool))
-                {
-                    g.DrawLine(MaakPen(elem.kleur, 3), elem.p1, elem.p2);
-                }
-            }
-            s.Invalidate();*/
             this.Bezig(g, p1, p2);
         }
 
