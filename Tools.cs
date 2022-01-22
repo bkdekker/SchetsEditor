@@ -220,41 +220,36 @@ namespace SchetsEditor
         {
             EventArgs ea = new EventArgs();
             s.Schoon(this, ea);
-            foreach (Element elem in s.Schets.elements_list)
+            for (int i = s.Schets.elements_list.Count - 1; i >= 0; i--)
             {
-                
-                if (elem.tool.GetType() == typeof(RechthoekTool))
+                Element k = s.Schets.elements_list[i];
+                Rectangle test = new Rectangle();
+                test = Punten2Rechthoek(k.p1, k.p2);
+                if (test.Contains(p2))
                 {
-                    Rectangle test = new Rectangle();
-                    test = Punten2Rechthoek(elem.p1, elem.p2);
-                    if (test.Contains(p2))
+                    k.tekenen = false;
+                    if (k.tekenen == false)
                     {
-                        elem.tekenen = false;
-                        //RechthoekTool.Compleet(s,g, elem.p1, elem.p2);
-                        //s.Schets.elements_list.RemoveAt(elem);
+                        s.Schets.elements_list.RemoveAt(i);
                     }
-                    if (elem.tekenen == true)
-                    elem.teken(this, g, elem.p1, elem.p2);
-
+                    i = -1;
 
                 }
-                //g.DrawLine(MaakPen(elem.kleur, 3), elem.p1, elem.p2);
-
 
             }
+            foreach (Element elem in s.Schets.elements_list)
+            {
+                elem.teken(this, g, elem.p1, elem.p2);
+            }
             s.Invalidate();
+
+
+        
+            
             //base.Compleet(s, g, p1, p2);
         }
     }
-    /*
-    public class GumTool : PenTool
-    {
-        public override string ToString() { return "gum"; }
 
-        public override void Bezig(Graphics g, Point p1, Point p2)
-        {
-            g.DrawLine(MaakPen(Brushes.White, 7), p1, p2);
-        }
-    }*/
+
 
 }
