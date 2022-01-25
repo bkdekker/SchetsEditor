@@ -16,12 +16,16 @@ namespace SchetsEditor
     {
         protected Point startpunt;
         protected Brush kwast;
+        //nieuw
+        protected int dikte_van_pen;
 
         public virtual void MuisVast(SchetsControl s, Point p)
         {   startpunt = p;
         }
         public virtual void MuisLos(SchetsControl s, Point p)
         {   kwast = new SolidBrush(s.PenKleur);
+            //nieuw
+            dikte_van_pen = s.Pendikte;
         }
         public abstract void MuisDrag(SchetsControl s, Point p);
         public abstract void Letter(SchetsControl s, char c);
@@ -48,7 +52,7 @@ namespace SchetsEditor
                 
                 TekstTool l = new TekstTool();
                 Point test = new Point(startpunt.X + 2*(int)sz.Width, startpunt.Y + 2*(int)sz.Width);
-                Element k = new Element(l, startpunt, test, kwast, true, tekst);
+                Element k = new Element(l, startpunt, test, kwast, true, tekst, dikte_van_pen);
                 s.Schets.elements_list.Add(k);
                 
                 startpunt.X += (int)sz.Width;
@@ -65,7 +69,8 @@ namespace SchetsEditor
                                 , new Size (Math.Abs(p1.X-p2.X), Math.Abs(p1.Y-p2.Y))
                                 );
         }
-        public static Pen MaakPen(Brush b, int dikte)
+        public Pen MaakPen(Brush b, int dikte)
+            //aangepast, hier stond eerst Brush b, Int dikte
         {   Pen pen = new Pen(b, dikte);
             pen.StartCap = LineCap.Round;
             pen.EndCap = LineCap.Round;
@@ -101,15 +106,17 @@ namespace SchetsEditor
 
         public override void Bezig(Graphics g, Point p1, Point p2)
         {   
-            g.DrawRectangle(MaakPen(kwast,3), TweepuntTool.Punten2Rechthoek(p1, p2)); 
+            // hier stond eerst
+            g.DrawRectangle(MaakPen(kwast, 3), TweepuntTool.Punten2Rechthoek(p1, p2)); 
         }
         public override void Compleet(SchetsControl s, Graphics g, Point p1, Point p2)
         {
           
             RechthoekTool l = new RechthoekTool();
-            Element k = new Element(l, p1, p2, kwast, true, "rechthoek");
+            Element k = new Element(l, p1, p2, kwast, true, "rechthoek", dikte_van_pen);
             s.Schets.elements_list.Add(k);
             this.Bezig(g, p1, p2);
+            
 
         }
     }
@@ -122,7 +129,7 @@ namespace SchetsEditor
         public override void Compleet(SchetsControl s, Graphics g, Point p1, Point p2)
         {
             VolRechthoekTool l = new VolRechthoekTool();
-            Element k = new Element(l, p1, p2, kwast, true, "volrechthoek");
+            Element k = new Element(l, p1, p2, kwast, true, "volrechthoek", dikte_van_pen);
             s.Schets.elements_list.Add(k);
             g.FillRectangle(kwast, TweepuntTool.Punten2Rechthoek(p1, p2));
 
@@ -134,13 +141,14 @@ namespace SchetsEditor
         public override string ToString() { return "lijn"; }
 
         public override void Bezig(Graphics g, Point p1, Point p2)
-        {   g.DrawLine(MaakPen(this.kwast,3), p1, p2);
+            //dit is aangepast
+        {   g.DrawLine(MaakPen(this.kwast, dikte_van_pen), p1, p2);
         }
         public override void Compleet(SchetsControl s, Graphics g, Point p1, Point p2)
         {
 
             LijnTool l = new LijnTool();
-            Element k = new Element(l, p1, p2, kwast, true, "LijnTool");
+            Element k = new Element(l, p1, p2, kwast, true, "LijnTool", dikte_van_pen);
             s.Schets.elements_list.Add(k);
             this.Bezig(g, p1, p2);
         }
@@ -156,9 +164,8 @@ namespace SchetsEditor
         }
         public override void Compleet(SchetsControl s, Graphics g, Point p1, Point p2)
         {
-            
             PenTool l = new PenTool();
-            Element k = new Element(l, p1, p2, kwast, true, "PenTool");
+            Element k = new Element(l, p1, p2, kwast, true, "PenTool", dikte_van_pen);
             s.Schets.elements_list.Add(k);
             this.Bezig(g, p1, p2);
         }
@@ -187,7 +194,9 @@ namespace SchetsEditor
                     k.tekenen = false;
                     if (k.tekenen == false)
                     {
+                        //s.Schets.vorige_elementen_list = s.Schets.elements_list; 
                         s.Schets.elements_list.RemoveAt(i);
+                        
                     }
                     i = -1;
 
@@ -205,6 +214,63 @@ namespace SchetsEditor
             
             //base.Compleet(s, g, p1, p2);
         }
+        //
+
+    }
+    //nieuwe klasse
+    public class Bring_forwardTool : TweepuntTool
+    {
+        public override string ToString() { return "Voorgrond"; }
+
+        public override void Bezig(Graphics g, Point p1, Point p2)
+        {
+            //g.DrawLine(MaakPen(Brushes.White, 7), p1, p2);
+        }
+        public override void Compleet(SchetsControl s, Graphics g, Point p1, Point p2)
+        {
+            EventArgs ea = new EventArgs();
+            s.Schoon(this, ea);
+            int tel = 0;
+            for (int i = s.Schets.elements_list.Count - 1; i >= 0; i--)
+            {
+                Element k = s.Schets.elements_list[i];
+                Rectangle test = new Rectangle();
+                Element l;
+                if (i  < s.Schets.elements_list.Count - 1)
+                    l = s.Schets.elements_list[i + 1];
+                else l = null;
+                test = Punten2Rechthoek(k.p1, k.p2);
+                if (test.Contains(p2))
+                {
+                    
+                    if (tel > 0)
+                    {
+                        //s.Schets.vorige_elementen_list = s.Schets.elements_list;
+                        s.Schets.elements_list.RemoveAt(i);
+                        s.Schets.elements_list.Insert(i, l);
+                        s.Schets.elements_list.RemoveAt(i+1);
+                        s.Schets.elements_list.Insert(i+1, k);
+                        
+                        i = -1;
+                    }
+                    tel++;
+
+                }
+
+            }
+            //ti.Insert(0, initialItem);
+            foreach (Element elem in s.Schets.elements_list)
+            {
+                elem.teken(this, g, elem.p1, elem.p2);
+            }
+            s.Invalidate();
+
+
+
+
+            //base.Compleet(s, g, p1, p2);
+        }
+
     }
 
 

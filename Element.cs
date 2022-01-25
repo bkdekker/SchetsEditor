@@ -16,6 +16,7 @@ namespace SchetsEditor
         public Brush kleur;
         public string tekst;
         public SchetsControl s;
+        public int dikte;
         //public List<Elem>
 
         public Element Get()
@@ -32,7 +33,7 @@ namespace SchetsEditor
             //this.
             
         }*/
-        public Element(ISchetsTool tool, Point p1, Point p2, Brush kleur, bool tekenen, string tekst)
+        public Element(ISchetsTool tool, Point p1, Point p2, Brush kleur, bool tekenen, string tekst, int dikte)
         {
 
             this.tool = tool;
@@ -40,7 +41,7 @@ namespace SchetsEditor
             this.p2 = p2;
             this.kleur = kleur;
             this.tekenen = tekenen;
-
+            this.dikte = dikte;
             if (tekst != null)
             {
                 this.tekst = tekst;
@@ -63,11 +64,11 @@ namespace SchetsEditor
         {
             if (tool.GetType() == typeof(PenTool))
             {
-                g.DrawLine(MaakPen(kleur, 3), p1, p2);
+                g.DrawLine(MaakPen(kleur, dikte), p1, p2);
             }
             else if (tool.GetType() == typeof(LijnTool))
             {
-                g.DrawLine(MaakPen(kleur, 3), p1, p2);
+                g.DrawLine(MaakPen(kleur, dikte), p1, p2);
             }
             else if (tool.GetType() == typeof(VolRechthoekTool))
             {
